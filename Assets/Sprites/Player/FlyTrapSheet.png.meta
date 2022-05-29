@@ -126,6 +126,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -135,8 +136,8 @@ TextureImporter:
   textureSettings:
     serializedVersion: 2
     filterMode: 0
-    aniso: -1
-    mipBias: -100
+    aniso: 1
+    mipBias: 0
     wrapU: 1
     wrapV: 1
     wrapW: 1
@@ -940,6 +941,41 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      PlayerAttackBottom5: -861756125340503192
+      PlayerAttackBottom6: -316068749757992125
+      PlayerAttackMiddle7: 1046281845490410447
+      PlayerAttackBottom8: -1248624585472725096
+      PlayerAttackTop2: 3467973122450903662
+      PlayerAttackBottom1: -3671907598050717846
+      PlayerAttackMiddle4: -8732932641239612152
+      PlayerAttackBottom7: -550810851706078904
+      PlayerAttackTop1: 2164116976488679513
+      PlayerAttackTop13: -661613290734006241
+      PlayerAttackMiddle5: 3831755259725141423
+      PlayerAttackTop14: -6311019558284196236
+      PlayerAttackMiddle6: -1195157113005838033
+      PlayerAttackMiddle10: 5728659892841603144
+      PlayerAttackTop3: -740522377936672146
+      PlayerAttackTop8: 6936298290306537108
+      PlayerAttackMiddle2: -8616601555223347844
+      PlayerAttackMiddle8: 8610896766111202948
+      PlayerAttackTop7: 1455943694597357896
+      PlayerAttackTop12: -7236071412321057721
+      PlayerAttackBottom4: -4594953774100052766
+      PlayerAttackTop4: 1925072370699617105
+      PlayerAttackTop9: 2697841013566264553
+      PlayerAttackBottom2: 3013104693130966541
+      PlayerIdle2: -163389749761193714
+      PlayerAttackMiddle1: -4206481029263562841
+      PlayerAttackBottom3: 8704884797957252378
+      PlayerIdle1: 5917980301335319452
+      PlayerAttackMiddle3: -2662763191087510013
+      PlayerAttackMiddle9: -5262390587344624012
+      PlayerAttackTop10: -9031335643844733728
+      PlayerAttackTop11: -7715934624745631949
+      PlayerAttackTop5: -5186459189532461680
+      PlayerAttackTop6: -4854368115519150433
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0
