@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class MenuButtons : MonoBehaviour
 {
     public GameMaster gm;
-    public GameObject spawner;
+    public Spawner spawnerScript;
     [Space]
     public GameObject startMenu;
     [Space]
@@ -21,6 +21,14 @@ public class MenuButtons : MonoBehaviour
     public Player player;
 
     private float previousVolume = 0;
+
+    private void Awake()
+    {
+        if(GameMaster.playAgainClicked == true)
+        {
+            StartGame();
+        }
+    }
 
     public void Menu()
     {
@@ -41,21 +49,7 @@ public class MenuButtons : MonoBehaviour
 
     public void StartGame()
     {
-        spawner.SetActive(true);
-        StartCoroutine(gm.StartTimer());
-        StartCoroutine(gm.DecreaseSlider());
-
-        startMenu.GetComponent<Image>().enabled = false;
-
-        for(int i = 0; i < startMenu.transform.childCount; i++)
-        {
-            Transform child = startMenu.transform.GetChild(i);
-
-            if (child != null)
-            {
-                child.gameObject.SetActive(false);
-            }
-        }
+        gm.GameStart();
     }
 
     public void Highscores()
@@ -113,7 +107,6 @@ public class MenuButtons : MonoBehaviour
             {
                 slider.GetComponent<Slider>().value = 0.0001f;
             }
-
         }
     }
 }

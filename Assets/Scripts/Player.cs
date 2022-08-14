@@ -15,10 +15,17 @@ public class Player : MonoBehaviour
     public GameMaster gm;
     public AudioSource chompAudio;
     public bool canAttack = true;
+    public bool beetleBuff = false;
   
     private int points = 0;
+    private int flyScore = 3;
+    private int beeScore = 1;
+    private int butterflyScore = 10;
+    private int ladybugScore = 5;
+    private int stagBeetleScore = 1;
+    private int queenBeeScore = 50;
+    private int queenFlyScore = 5;
   
-
     public int Points { get => points; set => points = value; }
 
     // Update is called once per frame
@@ -33,356 +40,178 @@ public class Player : MonoBehaviour
 
                 if (hit != false && hit.collider != null)
                 {
-                    if(hit.collider.CompareTag("Fly") || hit.collider.CompareTag("Bee") || hit.collider.CompareTag("Butterfly") || hit.collider.CompareTag("Ladybug") || hit.collider.CompareTag("QueenFly") || hit.collider.CompareTag("QueenBee"))
+                    if(hit.collider.CompareTag("Fly") || hit.collider.CompareTag("StagBeetle") || hit.collider.CompareTag("Bee") || hit.collider.CompareTag("Butterfly") || hit.collider.CompareTag("Ladybug") || hit.collider.CompareTag("QueenFly") || hit.collider.CompareTag("QueenBee"))
                     {
                         StartCoroutine(PlayAudio());
                         UpdateStats(hit.collider.tag);
                     }
 
+                    if (hit.collider.CompareTag("StagBeetle"))
+                    {
+                        if (!beetleBuff)
+                        {
+                            gm.GetComponent<Flash>().StartFlash();
+                            beetleBuff = true;
+                        }
+                    }
+
                     if (Vector2.Distance(hit.transform.position, spawner.GetComponent<Spawner>().slotArr[0].transform.position) < 0.01f)
                     {
-                        Debug.Log("slot1");
                         hit.transform.gameObject.GetComponent<Enemy>().canDie = false;
                         anim.SetTrigger("AttackingBottom1");
-                        
-                        if (hit.transform.gameObject.CompareTag("Fly"))
-                        {
-                            Points += 5;
-                            pointsText.text = Points.ToString();
-                            gm.IncreaseSlider(0.075f);
-                        }
-                        else if (hit.transform.gameObject.CompareTag("Butterfly"))
-                        {
-                            Points += 15;
-                            pointsText.text = Points.ToString();
-                            gm.IncreaseSlider(0.15f);
-                        }
-                        else if (hit.transform.gameObject.CompareTag("Ladybug"))
-                        {
-                            Points += 5;
-                            pointsText.text = Points.ToString();
-                            gm.IncreaseSlider(1f);
-                        }
-                        else if (hit.transform.gameObject.CompareTag("QueenBee"))
-                        {
-                            Points += 25;
-                            pointsText.text = Points.ToString();
-                            spawner.FillEmptySlotsWithBees();
-                        }
-                        else if (hit.transform.gameObject.CompareTag("QueenFly"))
-                        {
-                            Points += 5;
-                            pointsText.text = Points.ToString();
-                            spawner.FillEmptySlotsWithFlies();
-                        }
+                        Eat(hit.transform.tag);
                         StartCoroutine(CancelBottomAttack(hit.transform.gameObject.tag));
                     }
                     else if (Vector2.Distance(hit.transform.position, spawner.GetComponent<Spawner>().slotArr[1].transform.position) < 0.01f)
                     {
-                        Debug.Log("slot2");
                         hit.transform.gameObject.GetComponent<Enemy>().canDie = false;
                         anim.SetTrigger("AttackingBottom2");
-
-                        if (hit.transform.gameObject.CompareTag("Fly"))
-                        {
-                            Points += 5;
-                            pointsText.text = Points.ToString();
-                            gm.IncreaseSlider(0.075f);
-                        }
-                        else if (hit.transform.gameObject.CompareTag("Butterfly"))
-                        {
-                            Points += 15;
-                            pointsText.text = Points.ToString();
-                            gm.IncreaseSlider(0.15f);
-                        }
-                        else if (hit.transform.gameObject.CompareTag("Ladybug"))
-                        {
-                            Points += 5;
-                            pointsText.text = Points.ToString();
-                            gm.IncreaseSlider(1f);
-                        }
-                        else if (hit.transform.gameObject.CompareTag("QueenBee"))
-                        {
-                            Points += 25;
-                            pointsText.text = Points.ToString();
-                            spawner.FillEmptySlotsWithBees();
-                        }
-                        else if (hit.transform.gameObject.CompareTag("QueenFly"))
-                        {
-                            Points += 5;
-                            pointsText.text = Points.ToString();
-                            spawner.FillEmptySlotsWithFlies();
-                        }
+                        Eat(hit.transform.tag);
                         StartCoroutine(CancelBottomAttack(hit.transform.gameObject.tag));
                     }
                     else if (Vector2.Distance(hit.transform.position, spawner.GetComponent<Spawner>().slotArr[2].transform.position) < 0.01f)
                     {
-                        Debug.Log("slot3");
                         hit.transform.gameObject.GetComponent<Enemy>().canDie = false;
                         anim.SetTrigger("AttackingBottom3");
-
-                        if (hit.transform.gameObject.CompareTag("Fly"))
-                        {
-                            Points += 5;
-                            pointsText.text = Points.ToString();
-                            gm.IncreaseSlider(0.075f);
-                        }
-                        else if (hit.transform.gameObject.CompareTag("Butterfly"))
-                        {
-                            Points += 15;
-                            pointsText.text = Points.ToString();
-                            gm.IncreaseSlider(0.15f);
-                        }
-                        else if (hit.transform.gameObject.CompareTag("Ladybug"))
-                        {
-                            Points += 5;
-                            pointsText.text = Points.ToString();
-                            gm.IncreaseSlider(1f);
-                        }
-                        else if (hit.transform.gameObject.CompareTag("QueenBee"))
-                        {
-                            Points += 25;
-                            pointsText.text = Points.ToString();
-                            spawner.FillEmptySlotsWithBees();
-                        }
-                        else if (hit.transform.gameObject.CompareTag("QueenFly"))
-                        {
-                            Points += 5;
-                            pointsText.text = Points.ToString();
-                            spawner.FillEmptySlotsWithFlies();
-                        }
+                        Eat(hit.transform.tag);
                         StartCoroutine(CancelBottomAttack(hit.transform.gameObject.tag));
                     }
                     else if (Vector2.Distance(hit.transform.position, spawner.GetComponent<Spawner>().slotArr[3].transform.position) < 0.01f)
                     {
-                        Debug.Log("slot4");
                         hit.transform.gameObject.GetComponent<Enemy>().canDie = false;
                         anim.SetTrigger("AttackingMiddle1");
-
-                        if (hit.transform.gameObject.CompareTag("Fly"))
-                        {
-                            Points += 5;
-                            pointsText.text = Points.ToString();
-                            gm.IncreaseSlider(0.075f);
-                        }
-                        else if (hit.transform.gameObject.CompareTag("Butterfly"))
-                        {
-                            Points += 15;
-                            pointsText.text = Points.ToString();
-                            gm.IncreaseSlider(0.15f);
-                        }
-                        else if (hit.transform.gameObject.CompareTag("Ladybug"))
-                        {
-                            Points += 5;
-                            pointsText.text = Points.ToString();
-                            gm.IncreaseSlider(1f);
-                        }
-                        else if (hit.transform.gameObject.CompareTag("QueenBee"))
-                        {
-                            Points += 25;
-                            pointsText.text = Points.ToString();
-                            spawner.FillEmptySlotsWithBees();
-                        }
-                        else if (hit.transform.gameObject.CompareTag("QueenFly"))
-                        {
-                            Points += 5;
-                            pointsText.text = Points.ToString();
-                            spawner.FillEmptySlotsWithFlies();
-                        }
+                        Eat(hit.transform.tag);
                         StartCoroutine(CancelMiddleAttack(hit.transform.gameObject.tag));
                     }
                     else if (Vector2.Distance(hit.transform.position, spawner.GetComponent<Spawner>().slotArr[4].transform.position) < 0.01f)
                     {
-                        Debug.Log("slot5");
                         hit.transform.gameObject.GetComponent<Enemy>().canDie = false;
                         anim.SetTrigger("AttackingMiddle2");
-
-                        if (hit.transform.gameObject.CompareTag("Fly"))
-                        {
-                            Points += 5;
-                            pointsText.text = Points.ToString();
-                            gm.IncreaseSlider(0.075f);
-                        }
-                        else if (hit.transform.gameObject.CompareTag("Butterfly"))
-                        {
-                            Points += 15;
-                            pointsText.text = Points.ToString();
-                            gm.IncreaseSlider(0.15f);
-                        }
-                        else if (hit.transform.gameObject.CompareTag("Ladybug"))
-                        {
-                            Points += 5;
-                            pointsText.text = Points.ToString();
-                            gm.IncreaseSlider(1f);
-                        }
-                        else if (hit.transform.gameObject.CompareTag("QueenBee"))
-                        {
-                            Points += 25;
-                            pointsText.text = Points.ToString();
-                            spawner.FillEmptySlotsWithBees();
-                        }
-                        else if (hit.transform.gameObject.CompareTag("QueenFly"))
-                        {
-                            Points += 5;
-                            pointsText.text = Points.ToString();
-                            spawner.FillEmptySlotsWithFlies();
-                        }
+                        Eat(hit.transform.tag);
                         StartCoroutine(CancelMiddleAttack(hit.transform.gameObject.tag));
                     }
                     else if (Vector2.Distance(hit.transform.position, spawner.GetComponent<Spawner>().slotArr[5].transform.position) < 0.01f)
                     {
-                        Debug.Log("slot6");
                         hit.transform.gameObject.GetComponent<Enemy>().canDie = false;
-                        anim.SetTrigger("AttackingMiddle3");                      
-
-                        if (hit.transform.gameObject.CompareTag("Fly"))
-                        {
-                            Points += 5;
-                            pointsText.text = Points.ToString();
-                            gm.IncreaseSlider(0.075f);
-                        }
-                        else if (hit.transform.gameObject.CompareTag("Butterfly"))
-                        {
-                            Points += 15;
-                            pointsText.text = Points.ToString();
-                            gm.IncreaseSlider(0.15f);
-                        }
-                        else if (hit.transform.gameObject.CompareTag("Ladybug"))
-                        {
-                            Points += 5;
-                            pointsText.text = Points.ToString();
-                            gm.IncreaseSlider(1f);
-                        }
-                        else if (hit.transform.gameObject.CompareTag("QueenBee"))
-                        {
-                            Points += 25;
-                            pointsText.text = Points.ToString();
-                            spawner.FillEmptySlotsWithBees();
-                        }
-                        else if (hit.transform.gameObject.CompareTag("QueenFly"))
-                        {
-                            Points += 5;
-                            pointsText.text = Points.ToString();
-                            spawner.FillEmptySlotsWithFlies();
-                        }
+                        anim.SetTrigger("AttackingMiddle3");
+                        Eat(hit.transform.tag);
                         StartCoroutine(CancelMiddleAttack(hit.transform.gameObject.tag));
                     }
                     else if (Vector2.Distance(hit.transform.position, spawner.GetComponent<Spawner>().slotArr[6].transform.position) < 0.01f)
                     {
-                        Debug.Log("slot7");
                         hit.transform.gameObject.GetComponent<Enemy>().canDie = false;
                         anim.SetTrigger("AttackingTop1");
-
-                        if (hit.transform.gameObject.CompareTag("Fly"))
-                        {
-                            Points += 5;
-                            pointsText.text = Points.ToString();
-                            gm.IncreaseSlider(0.075f);
-                        }
-                        else if (hit.transform.gameObject.CompareTag("Butterfly"))
-                        {
-                            Points += 15;
-                            pointsText.text = Points.ToString();
-                            gm.IncreaseSlider(0.15f);
-                        }
-                        else if (hit.transform.gameObject.CompareTag("Ladybug"))
-                        {
-                            Points += 5;
-                            pointsText.text = Points.ToString();
-                            gm.IncreaseSlider(1f);
-                        }
-                        else if (hit.transform.gameObject.CompareTag("QueenBee"))
-                        {
-                            Points += 25;
-                            pointsText.text = Points.ToString();
-                            spawner.FillEmptySlotsWithBees();
-                        }
-                        else if (hit.transform.gameObject.CompareTag("QueenFly"))
-                        {
-                            Points += 5;
-                            pointsText.text = Points.ToString();
-                            spawner.FillEmptySlotsWithFlies();
-                        }
+                        Eat(hit.transform.tag);
                         StartCoroutine(CancelTopAttack(hit.transform.gameObject.tag));
                     }
                     else if (Vector2.Distance(hit.transform.position, spawner.GetComponent<Spawner>().slotArr[7].transform.position) < 0.01f)
                     {
-                        Debug.Log("slot8");
                         hit.transform.gameObject.GetComponent<Enemy>().canDie = false;
                         anim.SetTrigger("AttackingTop2");
-
-                        if (hit.transform.gameObject.CompareTag("Fly"))
-                        {
-                            Points += 5;
-                            pointsText.text = Points.ToString();
-                            gm.IncreaseSlider(0.075f);
-                        }
-                        else if (hit.transform.gameObject.CompareTag("Butterfly"))
-                        {
-                            Points += 15;
-                            pointsText.text = Points.ToString();
-                            gm.IncreaseSlider(0.15f);
-                        }
-                        else if (hit.transform.gameObject.CompareTag("Ladybug"))
-                        {
-                            Points += 5;
-                            pointsText.text = Points.ToString();
-                            gm.IncreaseSlider(1f);
-                        }
-                        else if (hit.transform.gameObject.CompareTag("QueenBee"))
-                        {
-                            Points += 25;
-                            pointsText.text = Points.ToString();
-                            spawner.FillEmptySlotsWithBees();
-                        }
-                        else if (hit.transform.gameObject.CompareTag("QueenFly"))
-                        {
-                            Points += 5;
-                            pointsText.text = Points.ToString();
-                            spawner.FillEmptySlotsWithFlies();
-                        }
+                        Eat(hit.transform.tag);
                         StartCoroutine(CancelTopAttack(hit.transform.gameObject.tag));
                     }
                     else if (Vector2.Distance(hit.transform.position, spawner.GetComponent<Spawner>().slotArr[8].transform.position) < 0.01f)
                     {
-                        Debug.Log("slot9");
                         hit.transform.gameObject.GetComponent<Enemy>().canDie = false;
-                        anim.SetTrigger("AttackingTop3");                
-
-                        if (hit.transform.gameObject.CompareTag("Fly"))
-                        {
-                            Points += 5;
-                            pointsText.text = Points.ToString();
-                            gm.IncreaseSlider(0.075f);
-                        }
-                        else if (hit.transform.gameObject.CompareTag("Butterfly"))
-                        {
-                            Points += 15;
-                            pointsText.text = Points.ToString();
-                            gm.IncreaseSlider(0.15f);
-                        }
-                        else if (hit.transform.gameObject.CompareTag("Ladybug"))
-                        {
-                            Points += 5;
-                            pointsText.text = Points.ToString();
-                            gm.IncreaseSlider(1f);
-                        }
-                        else if (hit.transform.gameObject.CompareTag("QueenBee"))
-                        {
-                            Points += 25;
-                            pointsText.text = Points.ToString();
-                            spawner.FillEmptySlotsWithBees();
-                        }
-                        else if (hit.transform.gameObject.CompareTag("QueenFly"))
-                        {
-                            Points += 5;
-                            pointsText.text = Points.ToString();
-                            spawner.FillEmptySlotsWithFlies();
-                        }
+                        anim.SetTrigger("AttackingTop3");
+                        Eat(hit.transform.tag);
                         StartCoroutine(CancelTopAttack(hit.transform.gameObject.tag));
                     }
                 }
             }
+        }
+    }
+
+    private void Eat(string bug)
+    {
+        switch (bug)
+        {
+            case "Fly":
+                if (beetleBuff)
+                {
+                    Points += (flyScore * 2);
+                }
+                else
+                {
+                    Points += flyScore;
+                }
+                pointsText.text = Points.ToString();
+                gm.IncreaseSlider(0.03f);
+                break;
+            case "Bee":
+                if (beetleBuff)
+                {
+                    Points += (beeScore * 2);
+                }
+                else
+                {
+                    Points += flyScore;
+                }
+                pointsText.text = Points.ToString();
+                break;
+            case "Butterfly":
+                if (beetleBuff)
+                {
+                    Points += (butterflyScore * 2);
+                }
+                else
+                {
+                    Points += butterflyScore;
+                }
+                pointsText.text = Points.ToString();
+                gm.IncreaseSlider(0.10f);
+                break;
+            case "QueenBee":
+                spawner.CancelSpawn();
+                if (beetleBuff)
+                {
+                    Points += (queenBeeScore * 2);
+                }
+                else
+                {
+                    Points += queenBeeScore;
+                }
+                pointsText.text = Points.ToString();
+                spawner.FillEmptySlotsWithBees();
+                break;
+            case "QueenFly":
+                spawner.CancelSpawn();
+                if (beetleBuff)
+                {
+                    Points += (queenFlyScore * 2);
+                }
+                else
+                {
+                    Points += queenFlyScore;
+                }
+                pointsText.text = Points.ToString();
+                spawner.FillEmptySlotsWithFlies();
+                break;
+            case "Ladybug":
+                if (beetleBuff)
+                {
+                    Points += (ladybugScore * 2);
+                }
+                else
+                {
+                    Points += ladybugScore;
+                }
+                pointsText.text = Points.ToString();
+                gm.IncreaseSlider(1f);
+                break;
+            case "StagBeetle":
+                if (beetleBuff)
+                {
+                    Points += (stagBeetleScore * 2);
+                }
+                else
+                {
+                    Points += stagBeetleScore;
+                }
+                pointsText.text = Points.ToString();
+                gm.IncreaseSlider(0.05f);
+                break;
         }
     }
 
@@ -408,6 +237,9 @@ public class Player : MonoBehaviour
             case "Ladybug":
                 gm.ladybugsEaten += 1;
                 break;
+            case "StagBeetle":
+                gm.stagBeetlesEaten += 1;
+                break;
         }
     }
 
@@ -421,7 +253,7 @@ public class Player : MonoBehaviour
         else
         {
             canAttack = false;
-            yield return new WaitForSeconds(0.35f);
+            yield return new WaitForSeconds(0.2f);
             anim.SetTrigger("Idle");
             canAttack = true;
         }
@@ -438,7 +270,7 @@ public class Player : MonoBehaviour
         else
         {
             canAttack = false;
-            yield return new WaitForSeconds(0.45f);
+            yield return new WaitForSeconds(0.3f);
             anim.SetTrigger("Idle");
             canAttack = true;
         }
@@ -450,12 +282,12 @@ public class Player : MonoBehaviour
     {
         if (tag == "Bee" || tag == "QueenBee")
         {
-            StartCoroutine(Stun(0.6f));          
+            StartCoroutine(Stun(0.45f));          
         }
         else
         {
             canAttack = false;
-            yield return new WaitForSeconds(0.55f);
+            yield return new WaitForSeconds(0.4f);
             anim.SetTrigger("Idle");
             canAttack = true;
         }
@@ -465,14 +297,13 @@ public class Player : MonoBehaviour
 
     IEnumerator Stun(float time)
     {
-        Debug.Log("stunned");
         canAttack = false;
 
         yield return new WaitForSeconds(time);
 
         anim.SetBool("Stunned", true);
 
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1.5f);
 
         canAttack = true;
         anim.SetBool("Stunned", false);
@@ -490,7 +321,7 @@ public class Player : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collision)
     {       
-        if (collision.gameObject.CompareTag("Fly") || collision.gameObject.CompareTag("Butterfly") || collision.gameObject.CompareTag("Bee") || collision.gameObject.CompareTag("QueenBee") || collision.gameObject.CompareTag("QueenFly") || collision.gameObject.CompareTag("Ladybug"))
+        if (collision.gameObject.CompareTag("Fly") || collision.gameObject.CompareTag("Butterfly") || collision.gameObject.CompareTag("Bee") || collision.gameObject.CompareTag("QueenBee") || collision.gameObject.CompareTag("QueenFly") || collision.gameObject.CompareTag("Ladybug") || collision.gameObject.CompareTag("StagBeetle"))
         {
             collision.gameObject.GetComponent<Enemy>().Die();       
         }        

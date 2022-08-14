@@ -13,7 +13,8 @@ public class Enemy : MonoBehaviour
     public bool canDie = true;
     public int score;
 
-    private float deathTimer = 6f;
+    private Player p;
+    private float deathTimer;
     private Spawner spawner;
     private Vector3 position;
     private GameMaster gm;
@@ -24,6 +25,8 @@ public class Enemy : MonoBehaviour
     {
         deathTimer = GameObject.Find("GameMaster").GetComponent<GameMaster>().deathTimer;
         gm = GameObject.Find("GameMaster").GetComponent<GameMaster>();
+        p = GameObject.Find("Player").GetComponent<Player>();
+
     }
 
     void Start()
@@ -53,24 +56,39 @@ public class Enemy : MonoBehaviour
 
     public void RunAway()
     {
+        StartCoroutine("RunAwayEnumerator");
+    }
+
+    IEnumerator RunAwayEnumerator()
+    {
         spawner.slotArr[slotPos].GetComponent<Slot>().isFull = false;
         Instantiate(runPrefab, position, transform.rotation);
+        yield return new WaitForEndOfFrame();
         Destroy(gameObject);
     }
 
     public void Die()
     {
+        StartCoroutine("DieEnumerator");
+    }
+
+    IEnumerator DieEnumerator()
+    {
         ShowScore(score, transform.position);
         spawner.slotArr[slotPos].GetComponent<Slot>().isFull = false;
         Instantiate(deathPrefab, position, transform.rotation);
+        yield return new WaitForEndOfFrame();
         Destroy(gameObject);
-
     }
 
     public void ShowScore(int score, Vector2 pos)
     {
+        if (p.beetleBuff)
+        {
+            score *= 2;
+        }
         Vector2 uiPos = Camera.main.WorldToScreenPoint(pos);
         scorePopup.gameObject.GetComponent<TextMeshProUGUI>().text = score.ToString();
-        Transform cloneScore = Instantiate(scorePopup, uiPos, Quaternion.identity, GameObject.FindGameObjectWithTag("Canvas").transform);
+        Instantiate(scorePopup, uiPos, Quaternion.identity, GameObject.FindGameObjectWithTag("Canvas").transform);
     }
 }

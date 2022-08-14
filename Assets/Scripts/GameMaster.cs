@@ -1,5 +1,5 @@
 using System.Collections;
-using System.Collections.Generic;
+using UnityEngine.Advertisements;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,14 +7,16 @@ using UnityEngine.UI;
 public class GameMaster : MonoBehaviour
 {
     public Player player;
-    public GameObject spawnerObj;
+    public Spawner spawnerScript;
     public GameObject energyBar;
     public GameObject gameOverMenu;
     public GameObject startMenu;
     public TextMeshProUGUI finalScore;
     public GameObject inputField;
     public GameObject username;
+    public GameObject watchAd;
     public Animator anim;
+    public MenuButtons btns;
     public float deathTimer = 0;
     public int flysEaten = 0;
     public int beesEaten = 0;
@@ -22,79 +24,108 @@ public class GameMaster : MonoBehaviour
     public int queenBeesEaten = 0;
     public int queenFlysEaten = 0;
     public int ladybugsEaten = 0;
+    public int stagBeetlesEaten = 0;
     public TextMeshProUGUI flysAmount;
     public TextMeshProUGUI beesAmount;
     public TextMeshProUGUI butterflysAmount;
     public TextMeshProUGUI queenBeesAmount;
     public TextMeshProUGUI queenFlysAmount;
     public TextMeshProUGUI ladybugsAmount;
+    public TextMeshProUGUI stagBeetlesAmount;
     public TextMeshProUGUI statsScore;
     public bool gameOver = false;
+    public GameObject countdown;
 
     public static bool playAgainClicked;
 
     private HighScores hs;
     private float timeSlice;
-    private bool upSpeed = true;
+    private float energyRate = 0.1f;
+    private int speedStage = 0;
+    private int counter = 0;
 
     public float TimeSlice { get => timeSlice; set => timeSlice = value; }
+    public int SpeedStage { get => speedStage; set => speedStage = value; }
 
     void Awake()
     {
         deathTimer = 5;
-        spawnerObj.GetComponent<Spawner>();
+        spawnerScript.GetComponent<Spawner>();
         hs = gameObject.GetComponent<HighScores>();
     }
 
     void Start()
     {
-        if (playAgainClicked == true)
-        {         
-            startMenu.GetComponent<MenuButtons>().StartGame();
-        }
-
         StartCoroutine(RefreshHighscores());
     }
 
-    public IEnumerator StartTimer()
+    public void GameStart()
     {
-        for(int i = 0; i < 40; i++)
+        Debug.Log(energyRate);
+        playAgainClicked = false;
+        SpeedStage = 0;
+        counter = 0;
+        energyRate = 0.1f;
+        spawnerScript.enabled = true;
+        InvokeRepeating("StartTimer", 0, 1);
+        StartCoroutine(DecreaseSlider());
+        startMenu.GetComponent<Image>().enabled = false;
+
+        for (int i = 0; i < startMenu.transform.childCount; i++)
         {
-            switch (i)
+            Transform child = startMenu.transform.GetChild(i);
+
+            if (child != null)
+            {
+                child.gameObject.SetActive(false);
+            }
+        }
+    }
+
+    private void StartTimer()
+    {
+        counter++;
+        if (SpeedStage < 6)
+        {
+            switch (counter)
             {
                 case 10:
+                    SpeedStage = 1;
                     SpeedUp();
                     break;
-
                 case 20:
+                    SpeedStage = 2;
                     SpeedUp();
                     break;
-
-                case 25:
-                    SpeedUp();
-                    break;
-
                 case 30:
+                    SpeedStage = 3;
                     SpeedUp();
                     break;
-                case 35:
+                case 40:
+                    SpeedStage = 4;
+                    SpeedUp();
+                    break;
+                case 50:
+                    SpeedStage = 5;
+                    SpeedUp();
+                    break;
+                case 60:
+                    SpeedStage = 6;
                     SpeedUp();
                     break;
             }
-            yield return new WaitForSeconds(1);
-
-            upSpeed = true;
+        }
+        else
+        {
+            CancelInvoke("StartTimer");
         }
     }
 
     void SpeedUp()
     {
-        if (upSpeed == true)
-        {
-            deathTimer -= 0.5f;
-            TimeSlice += 0.04f;
-            upSpeed = false;
-        }
+        spawnerScript.GetComponent<Spawner>().SpawnRepeatRate -= 0.01f;
+        deathTimer -= 0.55f;
+        energyRate -= 0.0097f;
     }
 
     public IEnumerator DecreaseSlider()
@@ -102,61 +133,53 @@ public class GameMaster : MonoBehaviour
         Slider slider = energyBar.GetComponent<Slider>();
         if (energyBar != null)
         {
-            TimeSlice = (slider.value / 20);
-            while(slider.value > 0)
+            TimeSlice = (slider.value / 125);
+            while (slider.value > 0)
             {
                 slider.value -= TimeSlice;
-                yield return new WaitForSeconds(1);
-                
-                if(slider.value <= 0.001f)
+                yield return new WaitForSeconds(energyRate);
+
+                if (slider.value <= 0.001f && !gameOver)
                 {
+                    CancelInvoke("StartTimer");
+                    spawnerScript.enabled = false;
                     gameOver = true;
                     player.canAttack = false;
-                    spawnerObj.SetActive(false);
                     anim.SetTrigger("Asleep");
-
-                    flysAmount.text = flysEaten.ToString();
-                    beesAmount.text = beesEaten.ToString();
-                    butterflysAmount.text = butterflysEaten.ToString();
-                    queenBeesAmount.text = queenBeesEaten.ToString();
-                    queenFlysAmount.text = queenFlysEaten.ToString();
-                    ladybugsAmount.text = ladybugsEaten.ToString();
-                    statsScore.text = finalScore.text;
-
-                    if (Application.internetReachability == NetworkReachability.NotReachable)
+                    if (CheckForHighscore(player.Points))
                     {
-                        for (int i = 0; i < gameOverMenu.transform.childCount; i++)
-                        {
-                            Transform child = gameOverMenu.transform.GetChild(i);
-
-                            if (child != null)
-                            {
-                                child.gameObject.SetActive(true);
-                            }
-                        }
+                        inputField.SetActive(true);
                     }
                     else
                     {
-                        if (CheckForHighscore(int.Parse(finalScore.text.ToString())) == true)
-                        {
-                            inputField.SetActive(true);
-                        }
-                        else
-                        {
-                            for (int i = 0; i < gameOverMenu.transform.childCount; i++)
-                            {
-                                Transform child = gameOverMenu.transform.GetChild(i);
-
-                                if (child != null)
-                                {
-                                    child.gameObject.SetActive(true);
-                                }
-                            }
-                        }
+                        EndGame();
                     }
+
                 }
             }
         }
+    }
+
+    public void EndGame()
+    {
+        for (int i = 0; i < gameOverMenu.transform.childCount; i++)
+        {
+            Transform child = gameOverMenu.transform.GetChild(i);
+
+            if (child != null)
+            {
+                child.gameObject.SetActive(true);
+            }
+        }
+
+        flysAmount.text = flysEaten.ToString();
+        beesAmount.text = beesEaten.ToString();
+        butterflysAmount.text = butterflysEaten.ToString();
+        queenBeesAmount.text = queenBeesEaten.ToString();
+        queenFlysAmount.text = queenFlysEaten.ToString();
+        ladybugsAmount.text = ladybugsEaten.ToString();
+        stagBeetlesAmount.text = stagBeetlesEaten.ToString();
+        statsScore.text = finalScore.text;
     }
 
     public void IncreaseSlider(float amount)
@@ -164,7 +187,7 @@ public class GameMaster : MonoBehaviour
         Slider slider = energyBar.GetComponent<Slider>();
 
         if ((slider.value += amount) <= slider.maxValue)
-        {           
+        {
             slider.value += amount;
         }
         else
@@ -217,28 +240,19 @@ public class GameMaster : MonoBehaviour
 
         if (hs.CheckUsername() == false)
         {
-
             if (int.TryParse(finalScore.text.ToString(), out result))
             {
                 StartCoroutine(hs.UploadNewScore(username.GetComponent<TextMeshProUGUI>().text, result));
                 gameOverMenu.GetComponent<Image>().enabled = false;
                 inputField.SetActive(false);
 
-                for (int i = 0; i < gameOverMenu.transform.childCount; i++)
-                {
-                    Transform child = gameOverMenu.transform.GetChild(i);
-
-                    if (child != null)
-                    {
-                        child.gameObject.SetActive(true);
-                    }
-                }
+                EndGame();
             }
         }
     }
 
     IEnumerator RefreshHighscores()
-    {      
+    {
         while (true)
         {
             StartCoroutine(hs.DownloadHighscoresFromDB());

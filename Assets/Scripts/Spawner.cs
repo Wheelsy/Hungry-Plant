@@ -9,23 +9,24 @@ public class Spawner : MonoBehaviour
     public Transform butterflyPrefab;
     public Transform beePrefab;
     public Transform ladybugPrefab;
+    public Transform stagBeetlePrefab;
     public Transform queenBeePrefab;
     public Transform queenFlyPrefab;
     //Array to keep track of spawned enemies
     public GameObject[] slotArr = new GameObject[9];
-    public float spawnDelay;
     public float spawnTimer;
 
+    private float spawnRepeatRate = 0.4f;
     private int previousSpawn = 10;
+    private bool times2Spawn = false;
 
-    void Awake()    
-    {
-        InvokeRepeating("Spawn", spawnTimer, spawnDelay);     
-    }
+    public float SpawnRepeatRate { get => spawnRepeatRate; set => spawnRepeatRate = value; }
+    public bool Times2Spawn { get => times2Spawn; set => times2Spawn = value; }
 
-    public void RestartSpawning()
+    private void ResetVariables()
     {
-        InvokeRepeating("Spawn", spawnTimer, spawnDelay);
+          spawnRepeatRate = 0.4f;
+          previousSpawn = 10;
     }
 
     public void Spawn()
@@ -38,46 +39,65 @@ public class Spawner : MonoBehaviour
 
             int spawnChance = Random.Range(1, 100);
             
-            if (spawnChance >= 24)
+            if (spawnChance >= 30)
             {
                 Transform newFly = Instantiate(flyPrefab, slotArr[slotPos].transform.position, Quaternion.identity);
                 newFly.GetComponent<Enemy>().slotPos = slotPos;
             }
-            else if (spawnChance >= 14 && spawnChance < 24)
+            else if (spawnChance >= 20 && spawnChance < 30)
             {
                 Transform newBee = Instantiate(beePrefab, slotArr[slotPos].transform.position, Quaternion.identity);
                 newBee.GetComponent<Enemy>().slotPos = slotPos;
             }
-            else if(spawnChance >= 8 && spawnChance < 14)
+            else if(spawnChance >= 14 && spawnChance < 20)
             {
                 Transform newButterfly = Instantiate(butterflyPrefab, slotArr[slotPos].transform.position, Quaternion.identity);
                 newButterfly.GetComponent<Enemy>().slotPos = slotPos;
             }
-            else if (spawnChance >= 4 && spawnChance < 8)
+            else if (spawnChance >= 10 && spawnChance < 14)
             {
                 Transform newQueenBee = Instantiate(queenBeePrefab, slotArr[slotPos].transform.position, Quaternion.identity);
                 newQueenBee.GetComponent<Enemy>().slotPos = slotPos;
             }
-            else if (spawnChance >= 2 && spawnChance < 4)
+            else if (spawnChance >= 6 && spawnChance < 10)
             {
                 Transform newQueenFly = Instantiate(queenFlyPrefab, slotArr[slotPos].transform.position, Quaternion.identity);
                 newQueenFly.GetComponent<Enemy>().slotPos = slotPos;
+            }
+            else if (spawnChance >= 4 && spawnChance < 6)
+            {
+                Transform newStagBeetle = Instantiate(stagBeetlePrefab, slotArr[slotPos].transform.position, Quaternion.identity);
+                newStagBeetle.GetComponent<Enemy>().slotPos = slotPos;
             }
             else if (spawnChance == 1)
             {
                 Transform newLadybug = Instantiate(ladybugPrefab, slotArr[slotPos].transform.position, Quaternion.identity);
                 newLadybug.GetComponent<Enemy>().slotPos = slotPos;
             }
-
             slotArr[slotPos].GetComponent<Slot>().isFull = true;
-        }              
+        }   
+    }
+
+    public void ClearSlots()
+    {
+        Enemy[] enemies = FindObjectsOfType(typeof(Enemy)) as Enemy[];
+
+        foreach(Enemy e in enemies)
+        {
+            Destroy(e);
+        }
+
+        for (int i = 0; i < slotArr.Length; i++)
+        {
+            slotArr[i].GetComponent<Slot>().isFull = false;
+        }
     }
 
     public void FillEmptySlotsWithBees()
     {
         for(int i = 0; i < slotArr.Length; i++)
         {
-            if (SlotCheck(i) == false && previousSpawn != i)
+            if (SlotCheck(i) == false )
             {
                 slotArr[i].GetComponent<Slot>().isFull = true;
                 previousSpawn = i;
@@ -85,13 +105,14 @@ public class Spawner : MonoBehaviour
                 newBee.GetComponent<Enemy>().slotPos = i;
             }
         }
+        RestartSpawn();
     }
 
     public void FillEmptySlotsWithFlies()
     {
         for (int i = 0; i < slotArr.Length; i++)
         {
-            if (SlotCheck(i) == false && previousSpawn != i)
+            if (SlotCheck(i) == false)
             {
                 slotArr[i].GetComponent<Slot>().isFull = true;
                 previousSpawn = i;
@@ -99,6 +120,7 @@ public class Spawner : MonoBehaviour
                 newFly.GetComponent<Enemy>().slotPos = i;
             }
         }
+        RestartSpawn();
     }
 
     private bool SlotCheck(int slot)
@@ -113,9 +135,29 @@ public class Spawner : MonoBehaviour
         return check;
     }
 
+    public void CancelSpawn()
+    {
+        CancelInvoke();
+    }
+
+    void RestartSpawn()
+    {
+        InvokeRepeating("Spawn", spawnTimer, SpawnRepeatRate);
+    }
+
     void OnDisable()
     {
         CancelInvoke();
+    }
+
+    void OnEnable()
+    {
+        ClearSlots();
+        if (GameMaster.playAgainClicked)
+        {
+            ResetVariables();
+        }
+        InvokeRepeating("Spawn", spawnTimer, SpawnRepeatRate);
     }
 }
 
