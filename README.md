@@ -4,6 +4,11 @@ Welcome to Hungry Plant!
 
 Feel free to download this repository and make any changes you'd like to the source code by opening it in the Unity game engine :)
 
+## Specs
+
+Platform: Android
+Target API: 13.0
+
 ## Download and Play
 
 To download and play the game:
