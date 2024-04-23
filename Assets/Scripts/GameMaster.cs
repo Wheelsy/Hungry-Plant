@@ -14,7 +14,6 @@ public class GameMaster : MonoBehaviour
     public TextMeshProUGUI finalScore;
     public GameObject inputField;
     public GameObject username;
-    public GameObject watchAd;
     public Animator anim;
     public MenuButtons btns;
     public float deathTimer = 0;
@@ -124,8 +123,8 @@ public class GameMaster : MonoBehaviour
     void SpeedUp()
     {
         spawnerScript.GetComponent<Spawner>().SpawnRepeatRate -= 0.01f;
-        deathTimer -= 0.55f;
-        energyRate -= 0.0097f;
+        deathTimer -= 0.56f;
+        energyRate -= 0.0099f;
     }
 
     public IEnumerator DecreaseSlider()
