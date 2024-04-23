@@ -18,6 +18,12 @@ To download and play the game (do the following steps on your android phone):
 4. Download the APK file from the release page.
 5. Find the game in your downloads folder and install (you will be promted to allow download from unknown sources)
 
+## Credit
+
+Music from [Fesliyan Studios](https://www.FesliyanStudios.com)  
+Game developer: Ely Hawkins
+
+##
 If you encounter any issues or have suggestions for improvements, feel free to open an issue or create a pull request.
 
 Happy gaming!
