@@ -6,7 +6,7 @@ Feel free to download this repository and make any changes you'd like to the sou
 
 ## Specs
 
-Platform: Android
+Platform: Android  
 Target API: 13.0
 
 ## Download and Play
